@@ -1,15 +1,13 @@
+# Jot
 
-This is a test commit.
-This is a test commit.
+A simple tool for jotting down information and storing in a database.
 
-Rust Programming Web Development Tutorial for building a simple Web Application, todoMVC, from scratch with WARP, SQLX, Database (PostgreSQL), and Native Web Components.
+## Install
 
-YouTube tutorials: 
-
-- Part 1 (database / model access) - https://youtu.be/VIig9IcQ-w8
-- Part 2 (web / warp filters) - https://youtu.be/plKzUo8F6Mg
-- Part 3 (frontend / #FrameworkLess) - https://youtu.be/DkR0tCBPqYc
-
+```sh
+cd frontend
+npm install
+```
 ## Run the example
 
 ```sh
@@ -60,4 +58,21 @@ docker run --rm -p 5432:5432 -e "POSTGRES_PASSWORD=postgres" --name pg postgres:
 docker exec -it -u postgres pg psql
 ```
 
+## Background
+
+This is a chance to learn expand upon the excellent Jeremy Chone tutorial
+
+Rust Development Tutorial for building a simple Web Application, 
+todoMVC, from scratch with WARP, SQLX, Database (PostgreSQL), and Native Web Components.
+
+YouTube tutorials: 
+
+- Part 1 (database / model access) - https://youtu.be/VIig9IcQ-w8
+- Part 2 (web / warp filters) - https://youtu.be/plKzUo8F6Mg
+- Part 3 (frontend / #FrameworkLess) - https://youtu.be/DkR0tCBPqYc
+
 ## License - MIT OR Apache-2.0
+
+## Change Log
+
+* Update README.md
