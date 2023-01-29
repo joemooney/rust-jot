@@ -1,34 +1,38 @@
+use dotenv::dotenv;
 use sqlx::postgres::PgPoolOptions;
 use sqlx::{Pool, Postgres};
 use std::fs;
 use std::path::PathBuf;
 use std::time::Duration;
 
-const PG_HOST: &str = "localhost";
-const PG_ROOT_DB: &str = "postgres";
-const PG_ROOT_USER: &str = "postgres";
-const PG_ROOT_PWD: &str = "postgres";
-// app db
-const PG_APP_DB: &str = "app_db";
-const PG_APP_USER: &str = "app_user";
-const PG_APP_PWD: &str = "app_pwd_to_change";
-const PG_APP_MAX_CON: u32 = 5;
-// sql files
-const SQL_DIR: &str = "sql/";
-const SQL_RECREATE: &str = "sql/00-recreate-db.sql";
-
 pub type Db = Pool<Postgres>;
 
 pub async fn init_db() -> Result<Db, sqlx::Error> {
+	dotenv().ok();
+	let pg_host: String = std::env::var("PG_HOST").unwrap_or(String::from("localhost"));
+	let pg_root_db: String = std::env::var("POSTGRES_DB").unwrap_or(String::from("postgres"));
+	let pg_root_user: String = std::env::var("POSTGRES_USER").unwrap_or(String::from("postgres"));
+	let pg_root_pwd: String = std::env::var("POSTGRES_PASSWORD").unwrap_or(String::from("postgres"));
+	// app db
+	let pg_app_db: String = std::env::var("PG_APP_DB").unwrap_or(String::from("app_db"));
+	let pg_app_user: String = std::env::var("PG_APP_USER").unwrap_or(String::from("app_user"));
+	let pg_app_pwd: String = std::env::var("PG_APP_PWD").unwrap_or(String::from("app_pwd_to_change"));
+	let pg_app_max_con: u32 = 5;
+	// sql files
+	let sql_dir: String = std::env::var("SQL_DIR").unwrap_or(String::from("sql/"));
+	let sql_recreate: String = std::env::var("SQL_RECREATE").unwrap_or(String::from("sql/00-recreate-db.sql"));
+
+	println!("pg_root_db: {pg_root_db} pg_root_user: {pg_root_user} pg_root_pwd: {pg_root_pwd}");
+
 	// -- Create the db with PG_ROOT (dev only)
 	{
-		let root_db = new_db_pool(PG_HOST, PG_ROOT_DB, PG_ROOT_USER, PG_ROOT_PWD, 1).await?;
-		pexec(&root_db, SQL_RECREATE).await?;
+		let root_db = new_db_pool(&pg_host, &pg_root_db, &pg_root_user, &pg_root_pwd, 1).await?;
+		pexec(&root_db, &sql_recreate).await?;
 	}
 
 	// -- Run the app sql files
-	let app_db = new_db_pool(PG_HOST, PG_APP_DB, PG_APP_USER, PG_APP_PWD, 1).await?;
-	let mut paths: Vec<PathBuf> = fs::read_dir(SQL_DIR)?
+	let app_db = new_db_pool(&pg_host, &pg_app_db, &pg_app_user, &pg_app_pwd, 1).await?;
+	let mut paths: Vec<PathBuf> = fs::read_dir(sql_dir)?
 		.into_iter()
 		.filter_map(|e| e.ok().map(|e| e.path()))
 		.collect();
@@ -37,14 +41,14 @@ pub async fn init_db() -> Result<Db, sqlx::Error> {
 	for path in paths {
 		if let Some(path) = path.to_str() {
 			// only .sql and not the recreate
-			if path.ends_with(".sql") && path != SQL_RECREATE {
+			if path.ends_with(".sql") && path != sql_recreate {
 				pexec(&app_db, &path).await?;
 			}
 		}
 	}
 
 	// returning the app db
-	new_db_pool(PG_HOST, PG_APP_DB, PG_APP_USER, PG_APP_PWD, PG_APP_MAX_CON).await
+	new_db_pool(&pg_host, &pg_app_db, &pg_app_user, &pg_app_pwd, pg_app_max_con).await
 }
 
 async fn pexec(db: &Db, file: &str) -> Result<(), sqlx::Error> {

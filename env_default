@@ -1,0 +1,14 @@
+# pgAdmin tool http://127.0.0.1:8080/browser/
+PGADMIN_DEFAULT_EMAIL=yourname@mail.com
+PGADMIN_DEFAULT_PASSWORD=password
+
+# Application User Credentials
+PG_APP_DB=mydb
+PG_APP_PWD=mypassword
+PG_APP_USER=myuser
+PG_HOST=localhost
+
+# docker uses these vars
+POSTGRES_DB=postgres
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=password

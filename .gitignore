@@ -1,5 +1,6 @@
 .*
 !.gitignore
+env
 
 # Rust dev assets
 target/
